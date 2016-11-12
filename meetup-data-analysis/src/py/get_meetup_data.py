@@ -8,7 +8,7 @@ def write_file(file_name,data):
     with open(file_name,'a') as f:
         f.write(data)
 
-def parse_city():
+def parse_city(delim):
     """
 
     :return:
@@ -16,7 +16,6 @@ def parse_city():
 
     base_path = "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/data"
     out_path =  "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/processed_data"
-    delim = '\001\005\001'
     out_name = os.path.join(out_path, 'meetup_cities.dat')
 
     for file in os.listdir(base_path):
@@ -32,14 +31,13 @@ def parse_city():
                            delim + str(record["ranking"]) + delim + str(record["zip"]) + '\n'
                     write_file(out_name,data)
 
-def parse_group():
+def parse_group(delim):
     """
 
     :return:
     """
     base_path = "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/data"
     out_path =  "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/processed_data"
-    delim = '\001\005\001'
     out_name = os.path.join(out_path, 'meetup_groups.dat')
 
     for file in os.listdir(base_path):
@@ -56,14 +54,13 @@ def parse_group():
                     write_file(out_name,data)
 
 
-def parse_events():
+def parse_events(delim):
     """
 
     :return:
     """
     base_path = "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/data"
     out_path = "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/processed_data"
-    delim = '\001\005\001'
     out_name = os.path.join(out_path, 'meetup_events.dat')
 
     for file in os.listdir(base_path):
@@ -79,14 +76,13 @@ def parse_events():
                     write_file(out_name,data)
 
 
-def parse_categories():
+def parse_categories(delim):
     """
 
     :return:
     """
     base_path = "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/data"
     out_path = "/Volumes/Seagate Backup Plus Drive/Bala_Personal_Backup/Learning/Indiana University/BAA-2016/project/dev/processed_data"
-    delim = '\001\005\001'
     out_name = os.path.join(out_path, 'meetup_categories.dat')
 
     for file in os.listdir(base_path):
@@ -100,7 +96,8 @@ def parse_categories():
 
 
 def main():
-    parse_categories()
+    delim = '\001\005\001'
+    parse_categories(delim)
 
 
 if __name__ == "__main__":
