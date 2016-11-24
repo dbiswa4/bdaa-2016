@@ -13,7 +13,7 @@ api_key = "779381934495d33c6f40555a801d4a"
 city_url = "https://api.meetup.com//2/cities"
 page = 10
 offset = 0
-city_table = "meetup_cities_test"
+city_table = "meetup_cities"
 localhost = '108.161.128.86'
 
 
