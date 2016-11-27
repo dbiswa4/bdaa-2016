@@ -23,8 +23,8 @@ if __name__ == "__main__":
 	    }
     }
 
-    table_name = sys.arg[1]
-    file_name = sys.arg[2]
+    table_name = sys.argv[1]
+    file_name = sys.argv[2]
 
     config['table_name'] = table_name
     config['file_name'] = file_name
