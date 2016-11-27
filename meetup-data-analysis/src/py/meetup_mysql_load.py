@@ -11,6 +11,8 @@ class MySQLUpdate(object):
         Constructor
         """
         self.config = config
+        print '\nPort:',self.config['db_config']['port']
+        print '\nDatabase:', self.config['db_config']['db']
         self.db_connection = utils.get_db_connection(self.config['db_config'])
 
 
@@ -19,23 +21,24 @@ class MySQLUpdate(object):
 
     def update_stats(self, stats_update_sql, stat_file):
         # Update statistics into table
-        logging.info("query to be executed : " + stats_update_sql)
+        print "query to be executed : " + stats_update_sql
         cursor = self.db_connection.cursor()
         updated_stats = 0
 
-        with open(stat_file, 'r') as f:
-            this_line = f.read().rstrip('\n')
+        f =open(stat_file, 'r')
+        for line in iter(f):
+            this_line = line.rstrip('\n')
 
-            # logging.info("this_line: " + str(this_line))
+            # print "this_line: " + str(this_line)
 
             # Insert each line which has values in csv
             final_query = stats_update_sql % this_line
-            logging.info(final_query)
+            #print 'final query : ', final_query
             cursor.execute(final_query)
             updated_stats += 1
 
         self.db_connection.commit()
-        logging.info("Changes committed to database - updated " + str(updated_stats) + " stats.")
+        print "Changes committed to database - updated " + str(updated_stats) + " stats."
 
 
     def run(self):

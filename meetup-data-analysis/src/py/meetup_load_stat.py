@@ -6,7 +6,7 @@ from meetup_mysql_load import MySQLUpdate
 def main(config):
     print 'main() method'
     mySQLUpdate = MySQLUpdate(config)
-    mySQLUpdate.run(config)
+    mySQLUpdate.run()
 
 
 
@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     config = {
 	"db_config" : {
-		"host": "108.161.128.86",
+		"host": "localhost",
 		"port": 3306,
 		"user": "meetup",
 		"passwd": "passw0rd",
