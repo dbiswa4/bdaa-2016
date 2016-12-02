@@ -30,7 +30,7 @@ def get_cities():
     per_page = page
     city_offset = offset
     table_name = "meetup_cities_test"
-    connection = happybase.Connection('108.161.128.86')
+    connection = happybase.Connection('xxx.xxx.xxx.xx')
     table = connection.table(table_name)
     for (country) in countries:
         results_we_got = per_page
