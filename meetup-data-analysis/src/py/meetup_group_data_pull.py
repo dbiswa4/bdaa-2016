@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import datetime, timedelta
 
 import requests
 import json
@@ -7,24 +8,51 @@ import codecs
 import sys
 import happybase
 
+'''
+Author : mbiswas
+Reference: https://www.meetup.com/meetup_api/, https://happybase.readthedocs.io/en/latest/
+
+'''
+
 UTF8Writer = codecs.getwriter('utf8')
 sys.stdout = UTF8Writer(sys.stdout)
 
-
+# CategoryID 2 : Career and Business
+# CategoryID 34 : Tech
 categories = ["2","34"]
-api_key = "779381934495d33c6f40555a801d4a"
+api_key = "779381934495d33c6f40555a8087754a#"
 group_url = "http://api.meetup.com/2/groups"
-page = 40
+page = 200
 offset = 0
 city_table = "meetup_cities"
 group_table = "meetup_groups"
-localhost = '108.161.128.86'
+localhost = 'xxx.xxx.xxx.xx'
+REQUEST_LATENCY=0.2
 
 
 def get_results(url,params):
     request = requests.get(url, params=params)
+    limit = request.headers['x-ratelimit-reset']
+    if limit == '2':
+        time.sleep(10)
     data = request.json()
+    _update_rate_limit(request.headers)
     return data
+
+def _wait_for_rate_limit(next_req_time):
+    now = datetime.now()
+    if next_req_time > now:
+        t = next_req_time - now
+        time.sleep(t.total_seconds())
+
+
+def _update_rate_limit(hdr):
+    remaining = float(hdr['x-ratelimit-remaining'])
+    reset = float(hdr['x-ratelimit-reset'])
+    spacing = reset / (1.0 + remaining)
+    delay = spacing - REQUEST_LATENCY
+    next_req_time = datetime.now() + timedelta(seconds=delay)
+    _wait_for_rate_limit(next_req_time)
 
 
 
@@ -37,11 +65,12 @@ def get_groups():
     connection = happybase.Connection(localhost)
     city_con = connection.table(city_table)
     group_con = connection.table(group_table)
-    row_key = b'1018090'
-    # row_key = b'501'
+    # put a starting row_key from meetup_cities table
+    row_key = b'11105'
     for i in range(10):
         for key, data in city_con.scan(row_start=row_key, limit=3000):
             country = data['city_details:country']
+            state = data['city_details:state']
             temp = key
             processed = data['city_details:processed']
             if processed == '0':
@@ -49,34 +78,28 @@ def get_groups():
                     results_we_got = per_page
                     while (results_we_got == per_page):
                         if country == 'us':
-                            # print country
+                            # For Country: US
                             response = get_results(group_url,
                                                    {"sign": "true", "country": country,
                                                     "city": data['city_details:city_name'],
                                                     "state": data['city_details:state'],
-                                                    # "city": "Phoenix",
-                                                    # "state": "AZ",
                                                     "key": api_key,
                                                     "page": per_page, "offset": group_offset,
                                                     "category_id": categoty})
 
                         else:
-                            # print country
+                            # For Country: India
                             response = get_results(group_url,
                                                    {"sign": "true", "country": country,
                                                     "city": data['city_details:city_name'],
-                                                    # "city": "Mumbai",
                                                     "key": api_key,
                                                     "page": per_page, "offset": group_offset, "category_id": categoty})
-                        time.sleep(0.5)
+
                         group_offset += 1
                         results_we_got = response['meta']['count']
                         exception_count = 0
                         print results_we_got, key
                         for group in response['results']:
-                            # print key, group['city']
-                            # print group['category']['id'],group['name'],group['city'],country,key
-                            # print group['description'].encode('ascii', 'ignore').encode('utf8').replace('\n', ' ')
                             try:
                                 desc = group['description'].encode('ascii', 'ignore').encode('utf8').replace('\n', ' ')
                             except Exception as e:
@@ -90,27 +113,21 @@ def get_groups():
                                                              'group_details:city': group['city'],
                                                              'group_details:create_date': str(group['created']),
                                                              'group_details:desc': desc,
-                                                             # 'group_details:last_event_date': group['state'],
                                                              'group_details:lat': str(group['lat']),
                                                              'group_details:lon': str(group['lon']),
+                                                             'group_details:state': str(state),
+                                                             'group_details:country': str(country),
                                                              'group_details:processed': str(group_flag)})
 
 
                             city_con.put(str(key), {'city_details:processed': str(city_flag)})
-                    time.sleep(0.5)
         row_key = temp.encode()
 
-    # print temp
 
 
 
 
 def main():
-    # state =''
-    # country = sys.argv[1]
-    # if country == 'US':
-    #     state = sys.argv[2]
-    # get_groups(country, state=state)
     get_groups()
 
 

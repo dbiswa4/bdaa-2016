@@ -17,7 +17,7 @@ class MySQLUpdate(object):
 
 
         self.insert_stmt = "INSERT INTO %s " % (self.config['table_name'])
-        self.insert_stmt += ' VALUES (%s)'
+        self.insert_stmt += " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '%s')"
 
     def update_stats(self, stats_update_sql, stat_file):
         # Update statistics into table
@@ -27,13 +27,12 @@ class MySQLUpdate(object):
 
         f =open(stat_file, 'r')
         for line in iter(f):
-            this_line = line.rstrip('\n')
+            this_total_line = line.rstrip('\n')
 
-            # print "this_line: " + str(this_line)
+            this_line = this_total_line.split(',')
 
-            # Insert each line which has values in csv
-            final_query = stats_update_sql % this_line
-            #print 'final query : ', final_query
+            final_query = stats_update_sql % (this_line[0],this_line[1],this_line[2],this_line[3],this_line[4],this_line[5],this_line[6],this_line[7],this_line[8],this_line[9],this_line[10],this_line[11])
+            print 'final query : ', final_query
             cursor.execute(final_query)
             updated_stats += 1
 
